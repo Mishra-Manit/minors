@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debate Registration Form</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #f5f5f5;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 32rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .form-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 0.75rem;
+            background: linear-gradient(135deg, #ffffff 0%, #a3a3a3 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .form-description {
+            font-size: 1rem;
+            color: #a3a3a3;
+            font-weight: 400;
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #e5e5e5;
+            margin-bottom: 0.75rem;
+            letter-spacing: 0.025em;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            border: 1px solid #404040;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            background-color: rgba(23, 23, 23, 0.8);
+            color: #f5f5f5;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+        }
+
+        .form-input::placeholder {
+            color: #737373;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+            background-color: rgba(23, 23, 23, 0.9);
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            border: 1px solid #404040;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            background-color: rgba(23, 23, 23, 0.8);
+            color: #f5f5f5;
+            resize: vertical;
+            min-height: 8rem;
+            font-family: inherit;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+        }
+
+        .form-textarea::placeholder {
+            color: #737373;
+        }
+
+        .form-textarea:focus {
+            outline: none;
+            border-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+            background-color: rgba(23, 23, 23, 0.9);
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1.25rem;
+            margin-top: 0.75rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border: 1px solid #404040;
+            border-radius: 0.75rem;
+            background-color: rgba(23, 23, 23, 0.6);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+        }
+
+        .checkbox-item:hover {
+            border-color: #525252;
+            background-color: rgba(23, 23, 23, 0.8);
+        }
+
+        .checkbox-item:has(.checkbox-input:checked) {
+            border-color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .checkbox-input {
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid #525252;
+            border-radius: 0.375rem;
+            background-color: transparent;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            appearance: none;
+            position: relative;
+        }
+
+        .checkbox-input:checked {
+            background-color: #ffffff;
+            border-color: #ffffff;
+        }
+
+        .checkbox-input:checked::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 0.5rem;
+            height: 0.75rem;
+            border: 2px solid #000000;
+            border-top: none;
+            border-left: none;
+            transform: translate(-50%, -60%) rotate(45deg);
+        }
+
+        .checkbox-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+        }
+
+        .checkbox-label {
+            font-size: 0.9rem;
+            color: #e5e5e5;
+            cursor: pointer;
+            user-select: none;
+            font-weight: 500;
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 1.25rem 2rem;
+            background: linear-gradient(135deg, #ffffff 0%, #d4d4d4 100%);
+            color: #000000;
+            border: none;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            letter-spacing: 0.025em;
+            margin-top: 1rem;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 255, 255, 0.2);
+            background: linear-gradient(135deg, #f5f5f5 0%, #e5e5e5 100%);
+        }
+
+        .submit-button:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+        }
+
+        .submit-button:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 1.5rem 1rem;
+            }
+            
+            .form-title {
+                font-size: 2rem;
+            }
+            
+            .checkbox-group {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .form-container {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .checkbox-group {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <div class="form-header">
+            <h1 class="form-title">Join the Debate</h1>
+            <p class="form-description">Register to participate in our modern debate platform</p>
+        </div>
+
+        <form id="debateForm" onsubmit="submitForm(event)">
+            <div class="form-group">
+                <label for="name" class="form-label">Full Name</label>
+                <input 
+                    type="text" 
+                    id="name" 
+                    name="name" 
+                    class="form-input" 
+                    placeholder="Enter your full name"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Political Inclination</label>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="liberal" name="political_inclination" value="liberal" class="checkbox-input">
+                        <label for="liberal" class="checkbox-label">Liberal</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="conservative" name="political_inclination" value="conservative" class="checkbox-input">
+                        <label for="conservative" class="checkbox-label">Conservative</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="moderate" name="political_inclination" value="moderate" class="checkbox-input">
+                        <label for="moderate" class="checkbox-label">Moderate</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="independent" name="political_inclination" value="independent" class="checkbox-input">
+                        <label for="independent" class="checkbox-label">Independent</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="context" class="form-label">Debate Context</label>
+                <textarea 
+                    id="context" 
+                    name="context" 
+                    class="form-textarea" 
+                    placeholder="Share your thoughts on the debate topics, your experience, or any relevant context..."
+                    required
+                ></textarea>
+            </div>
+
+            <button type="submit" class="submit-button">
+                Register for Debate
+            </button>
+        </form>
+
+        <!-- Add a status message div -->
+        <div id="statusMessage" style="margin-top: 1rem; text-align: center; display: none;"></div>
+    </div>
+
+    <script>
+        async function submitForm(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const formData = new FormData(form);
+            
+            try {
+                const response = await fetch('/submit_debate', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                const statusMessage = document.getElementById('statusMessage');
+                statusMessage.style.display = 'block';
+                
+                if (result.status === 'success') {
+                    statusMessage.style.color = '#4ade80';
+                    statusMessage.textContent = result.message;
+                    form.reset();
+                    
+                    // Redirect to home page after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 2000);
+                } else {
+                    statusMessage.style.color = '#ef4444';
+                    statusMessage.textContent = result.message;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                const statusMessage = document.getElementById('statusMessage');
+                statusMessage.style.display = 'block';
+                statusMessage.style.color = '#ef4444';
+                statusMessage.textContent = 'An error occurred while submitting the form.';
+            }
+        }
+    </script>
+</body>
+</html>
