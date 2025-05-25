@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Political Compass</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #f5f5f5;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .header {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            text-align: center;
+            background: linear-gradient(135deg, #ffffff 0%, #a3a3a3 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .compass-container {
+            width: 100%;
+            max-width: 32rem;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .compass-wrapper {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            background-color: rgba(23, 23, 23, 0.8);
+            border: 1px solid #404040;
+            border-radius: 0.75rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .compass-wrapper:hover {
+            border-color: #525252;
+            background-color: rgba(23, 23, 23, 0.9);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .y-axis-label {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            position: absolute;
+            left: -60px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #e5e5e5;
+            letter-spacing: 0.025em;
+        }
+
+        .compass-canvas {
+            border: 2px solid #404040;
+            cursor: crosshair;
+            background-color: rgba(23, 23, 23, 0.6);
+            border-radius: 0.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .compass-canvas:hover {
+            border-color: #525252;
+        }
+
+        .x-axis-label {
+            margin-top: 1rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #e5e5e5;
+            letter-spacing: 0.025em;
+        }
+
+        .axis-labels {
+            display: flex;
+            justify-content: space-between;
+            width: 400px;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: #a3a3a3;
+        }
+
+        .y-axis-labels {
+            position: absolute;
+            left: -40px;
+            top: 2rem;
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: #a3a3a3;
+        }
+
+        .results {
+            width: 100%;
+            padding: 1.5rem;
+            background-color: rgba(23, 23, 23, 0.8);
+            border: 1px solid #404040;
+            border-radius: 0.75rem;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .results:hover {
+            border-color: #525252;
+            background-color: rgba(23, 23, 23, 0.9);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .coordinate {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: #e5e5e5;
+            letter-spacing: 0.025em;
+        }
+
+        .political-leaning {
+            font-size: 1.4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-transform: capitalize;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            width: 100%;
+        }
+
+        .confirm-button {
+            padding: 0.75rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #000000;
+            background: #ffffff;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1.5rem;
+        }
+
+        .confirm-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+        }
+
+        .confirm-button:active {
+            transform: translateY(0);
+        }
+
+        .instructions {
+            width: 100%;
+            text-align: center;
+            color: #a3a3a3;
+            font-size: 0.9rem;
+            padding: 1rem;
+            background-color: rgba(23, 23, 23, 0.6);
+            border: 1px solid #404040;
+            border-radius: 0.75rem;
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body>
+    <h1 class="header">Choose your Debater: Political Leaning</h1>
+    
+    <div class="compass-container">
+        <div class="compass-wrapper">
+            <div class="y-axis-label">Government Type</div>
+            <canvas id="compass" class="compass-canvas" width="400" height="400"></canvas>
+            <div class="x-axis-label">Economic Standing</div>
+        </div>
+        <div class="results">
+            <div class="coordinate" id="coordinates">Click on the compass to see coordinates</div>
+            <div class="political-leaning" id="political-leaning">Political leaning will appear here</div>
+        </div>
+        <button class="confirm-button">Confirm</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('compass');
+        const ctx = canvas.getContext('2d');
+        const coordinatesDiv = document.getElementById('coordinates');
+        const politicalLeaningDiv = document.getElementById('political-leaning');
+
+        // Draw the compass grid
+        function drawCompass() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Set styles for grid lines
+            ctx.strokeStyle = '#666666';
+            ctx.lineWidth = 0.5;
+            
+            // Draw grid lines
+            for (let i = 0; i <= 20; i++) {
+                const pos = (i / 20) * 400;
+                
+                // Vertical lines
+                ctx.beginPath();
+                ctx.moveTo(pos, 0);
+                ctx.lineTo(pos, 400);
+                ctx.stroke();
+                
+                // Horizontal lines
+                ctx.beginPath();
+                ctx.moveTo(0, pos);
+                ctx.lineTo(400, pos);
+                ctx.stroke();
+            }
+            
+            // Draw main axes (bold white lines)
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            
+            // X-axis (horizontal line at center)
+            ctx.beginPath();
+            ctx.moveTo(0, 200);
+            ctx.lineTo(400, 200);
+            ctx.stroke();
+            
+            // Y-axis (vertical line at center)
+            ctx.beginPath();
+            ctx.moveTo(200, 0);
+            ctx.lineTo(200, 400);
+            ctx.stroke();
+        }
+
+        // Convert canvas coordinates to political compass coordinates
+        function canvasToCompass(canvasX, canvasY) {
+            // Map X from 0-400 to -50 to 50
+            const x = ((canvasX / 400) * 100) - 50;
+            // Map Y from 0-400 to 50 to -50 (inverted because canvas Y grows downward)
+            const y = 50 - ((canvasY / 400) * 100);
+            return { x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10 };
+        }
+
+        // Determine political leaning based on coordinates
+        function getPoliticalLeaning(x, y) {
+            let economic = '';
+            let authority = '';
+            
+            // Economic axis classification
+            if (x <= -20) economic = 'far left';
+            else if (x <= -10) economic = 'left';
+            else if (x <= -3) economic = 'center left';
+            else if (x <= 3) economic = 'center';
+            else if (x <= 10) economic = 'center right';
+            else if (x <= 20) economic = 'right';
+            else economic = 'far right';
+            
+            // Authority axis classification
+            if (y <= -20) authority = 'libertarian';
+            else if (y <= -10) authority = 'moderate libertarian';
+            else if (y <= -3) authority = 'libertarian leaning';
+            else if (y <= 3) authority = 'centrist';
+            else if (y <= 10) authority = 'authoritarian leaning';
+            else if (y <= 20) authority = 'moderate authoritarian';
+            else authority = 'authoritarian';
+            
+            // Combine for final classification
+            if (economic === 'center' && authority === 'centrist') {
+                return 'pure centrist';
+            } else if (economic.includes('center') && authority === 'centrist') {
+                return `${economic} centrist`;
+            } else if (economic === 'center') {
+                return `center ${authority}`;
+            } else {
+                return `${economic} ${authority}`;
+            }
+        }
+
+        // Handle canvas clicks
+        let lastClickedX, lastClickedY; // Variables to store coordinates
+        
+        // Political compass dictionary
+        const political_compass = {
+            'Joseph Stalin': [-49.5, 48.7],
+            'Margaret Thatcher': [49.1, 47.6],
+            'Milton Friedman': [46.8, -48.3],
+            'Emma Goldman': [-47.9, -49.2],
+            'Fidel Castro': [-31.4, 28.9],
+            'Ronald Reagan': [33.8, 36.5],
+            'Noam Chomsky': [-28.7, -29.1],
+            'Ayn Rand': [29.4, -30.3],
+            'Barack Obama': [5.2, -3.7],
+            'Karl Marx': [-48.6, 29.8],
+            'Vladimir Lenin': [-49.3, 38.2],
+            'Mao Zedong': [-40.7, 48.4],
+            'Benito Mussolini': [21.5, 49.1],
+            'Adolf Hitler': [12.2, 49.6],
+            'Francisco Franco': [32.8, 47.9],
+            'Augusto Pinochet': [41.3, 49.7],
+            'Xi Jinping': [22.5, 38.9],
+            'Hugo Chávez': [-38.2, 32.1],
+            'Salvador Allende': [-29.9, 21.4],
+            'Che Guevara': [-33.7, 38.6],
+            'Leon Trotsky': [-48.1, 22.9],
+            'Friedrich Engels': [-39.4, 19.8],
+            'Mikhail Bakunin': [-49.0, -41.5],
+            'Peter Kropotkin': [-42.3, -48.7],
+            'Murray Rothbard': [39.5, -38.6],
+            'Ron Paul': [28.2, -42.1],
+            'John Locke': [-9.7, -39.2],
+            'Thomas Jefferson': [-12.3, -31.5],
+            'Benjamin Franklin': [2.8, -22.6],
+            'Susan B. Anthony': [-8.6, -21.4],
+            'Martin Luther King Jr.': [-19.2, -18.7],
+            'Malala Yousafzai': [-28.4, -28.5],
+            'Mahatma Gandhi': [-18.8, -38.9],
+            'Nelson Mandela': [-9.4, -12.7],
+            'Eleanor Roosevelt': [-11.5, -9.8],
+            'Alexandria Ocasio-Cortez': [-43.7, -11.2],
+            'Bernie Sanders': [-31.6, 2.3],
+            'Elizabeth Warren': [-20.4, 1.2],
+            'Joe Biden': [7.5, 8.9],
+            'Donald Trump': [18.7, 19.6],
+            'Bill Clinton': [21.3, 42.1],
+            'Franklin D. Roosevelt': [2.4, 38.5],
+            'Tony Blair': [11.6, 18.3],
+            'Angela Merkel': [8.4, 1.5],
+            'Emmanuel Macron': [12.2, -1.1],
+            'Justin Trudeau': [8.9, -9.7],
+            'Jacinda Ardern': [1.2, 11.3],
+            'George Washington': [2.8, 9.4],
+            'Woodrow Wilson': [9.2, 31.5],
+            'Friedrich Hayek': [39.1, -19.8],
+            'Gary Johnson': [18.4, -41.2],
+            'Peter Thiel': [41.5, -29.4],
+            'Elon Musk': [29.6, -18.8],
+            'John Stossel': [21.7, -32.3],
+            'Mitt Romney': [31.2, -9.5],
+            'Bill Gates': [39.9, -12.4],
+            'Jeff Bezos': [49.2, -11.8],
+            'Mark Zuckerberg': [24.7, -8.3],
+            'Richard Branson': [31.5, 9.2],
+            'Richard Nixon': [29.4, 21.1],
+            'George W. Bush': [19.8, 20.3],
+            'Silvio Berlusconi': [41.7, 18.6],
+            'Boris Johnson': [25.3, 14.8],
+            'David Cameron': [30.8, 9.7]
+        };
+
+        // Function to calculate Euclidean distance between two points
+        function calculateDistance(x1, y1, x2, y2) {
+            return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+        }
+
+        // Function to find candidates within radius
+        function findCandidatesInRadius(centerX, centerY, radius) {
+            const nearbyCandidates = [];
+            
+            for (const [name, coords] of Object.entries(political_compass)) {
+                const distance = calculateDistance(centerX, centerY, coords[0], coords[1]);
+                if (distance <= radius) {
+                    nearbyCandidates.push(name);
+                }
+            }
+            
+            return nearbyCandidates;
+        }
+
+        // Handle canvas clicks
+        canvas.addEventListener('click', function(event) {
+            const rect = canvas.getBoundingClientRect();
+            const canvasX = event.clientX - rect.left;
+            const canvasY = event.clientY - rect.top;
+            
+            const coords = canvasToCompass(canvasX, canvasY);
+            lastClickedX = coords.x;
+            lastClickedY = coords.y;
+            
+            const leaning = getPoliticalLeaning(coords.x, coords.y);
+            
+            // Update both coordinates and political leaning displays
+            document.getElementById('coordinates').textContent = `Coordinates: (${coords.x.toFixed(1)}, ${coords.y.toFixed(1)})`;
+            politicalLeaningDiv.textContent = leaning;
+            
+            drawCompass();
+            ctx.fillStyle = '#4CAF50';
+            ctx.beginPath();
+            ctx.arc(canvasX, canvasY, 5, 0, 2 * Math.PI);
+            ctx.fill();
+        });
+
+        // Handle confirm button click
+        document.querySelector('.confirm-button').onclick = function() {
+            const selectedCandidates = findCandidatesInRadius(lastClickedX, lastClickedY, 10);
+            // Store the selected candidates in localStorage
+            localStorage.setItem('selectedCandidates', JSON.stringify(selectedCandidates));
+            // Navigate to file.html
+            window.location.href = 'file.html';
+        };
+
+        // Initial draw
+        drawCompass();
+    </script>
+</body>
+</html>
