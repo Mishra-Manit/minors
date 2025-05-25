@@ -39,7 +39,7 @@
 
         .header {
             text-align: center;
-            margin-bottom: 3rem;
+            margin-bottom: 2rem;
             position: relative;
             z-index: 1;
         }
@@ -52,6 +52,43 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
             letter-spacing: 0.025em;
+        }
+
+        .message {
+            text-align: center;
+            color: #a3a3a3;
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background-color: rgba(23, 23, 23, 0.8);
+            border-radius: 0.75rem;
+            border: 1px solid #404040;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .back-button {
+            display: block;
+            margin: 2rem auto;
+            padding: 0.75rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #000000;
+            background: #ffffff;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+        }
+
+        .back-button:active {
+            transform: translateY(0);
         }
 
         .cards-container {
@@ -224,18 +261,27 @@
         <h1>Choose Your Debater: Political Icon</h1>
     </div>
     
+    <div id="noResultsMessage" class="message" style="display: none;">
+        Sorry, no icons found in that political leaning. Here are a few sample icons:
+    </div>
+    
     <div class="cards-container" id="cardsContainer">
         <!-- Cards will be generated dynamically by JavaScript -->
     </div>
 
+    <button class="back-button" onclick="window.location.href='index.html'">Back to Home</button>
+
     <script>
-        // Get selected candidates from localStorage
-        const icon_list = JSON.parse(localStorage.getItem('selectedCandidates')) || [
+        // Sample list for when no results are found
+        const sampleList = [
             "Donald Trump",
             "Joe Biden", 
             "Barack Obama",
             "Bernie Sanders"
         ];
+
+        // Get selected candidates from localStorage
+        let icon_list = JSON.parse(localStorage.getItem('selectedCandidates')) || [];
 
         // Function to create a card element
         function createCard(name) {
@@ -258,7 +304,16 @@
         // Function to render all cards
         function renderCards() {
             const container = document.getElementById('cardsContainer');
+            const messageElement = document.getElementById('noResultsMessage');
             container.innerHTML = ''; // Clear existing cards
+            
+            // If icon_list is empty, show message and use sample list
+            if (icon_list.length === 0) {
+                messageElement.style.display = 'block';
+                icon_list = sampleList;
+            } else {
+                messageElement.style.display = 'none';
+            }
             
             icon_list.forEach(name => {
                 const card = createCard(name);
